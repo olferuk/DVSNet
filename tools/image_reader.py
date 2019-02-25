@@ -13,21 +13,27 @@ def read_labeled_image_list(data_dir, data_list):
     Returns:
       Two lists with all file names for images and masks, respectively.
     """
-    f = open(data_list, 'r')
-    images = []
-    for line in f:
-        try:
-            image = line[:-1].split('\n')[0]
-        except ValueError: # Adhoc for test.
-            image = line.strip("\n")
-
-        image = data_dir+image
-        if not tf.gfile.Exists(image):
-            raise ValueError('Failed to find file: ' + image1)
-
-        images.append(image)
-    f.close()
+    if not data_dir.endswith('/'):
+        data_dir = data_dir + '/'
+    with open(data_list) as f:
+        images = [data_dir + x.strip() for x in f.read().split('\n')]
     return images
+
+    #f = open(data_list, 'r')
+    #images = []
+    #for line in f:
+    #    try:
+    #        image = line[:-1].split('\n')[0]
+    #    except ValueError: # Adhoc for test.
+    #        image = line.strip("\n")
+
+    #    image = data_dir+image
+    #    if not tf.gfile.Exists(image):
+    #        raise ValueError('Failed to find file: ' + image1)
+
+    #    images.append(image)
+    #f.close()
+    #return images
 
 
 def read_images_from_disk(input_queue, input_size, overlap, img_mean=IMG_MEAN):
