@@ -174,8 +174,9 @@ def main():
                 overlap4(i, pred, max_value, preds, preds_value, input_size=[height, width], overlap=args.overlap)
 
         else:
-            image_inputs, key_tmps, flow_features, flow_fields, scale_fields = sess.run([image_s, image_f, flow_feature, flows['flow'], flows['scale']],
-                            feed_dict={key_image:key_inputs})
+            image_inputs, key_tmps, flow_features, flow_fields, scale_fields = \
+                sess.run([image_s, image_f, flow_feature, flows['flow'], flows['scale']], 
+                          feed_dict={key_image: key_inputs})
             pred_scores = np.squeeze(decisionNet.pred(sess, flow_features))
             for i in range(region):
                 print("step {} region {} predict score: {:.3}  target: {:.3}".format(step, i, pred_scores[i], targets[i]))
@@ -203,8 +204,14 @@ def main():
         print("fps: {:.3}".format(1/total_time))
 
         # Write result image
+        folder_to_save = args.save_dir
+        if not folder_to_save.endswith('/'):
+            folder_to_save = folder_to_save + '/'
+        fname = 'mask{0}.png'.format(step)
+        full_path = os.path.join(os.path.abspath(folder_to_save), fname)
+        
         mask = sess.run(pred_img, feed_dict={output: preds})
-        misc.imsave(args.save_dir + 'mask' + str(step) + '.png', mask[0])
+        misc.imsave(full_path, mask[0])
 
     print('\nFinish!')
     print("segmentation steps:", seg_step, "flow steps:", flow_step)
